@@ -1,0 +1,20 @@
+Декомпозиция задания Markdown
+
+1. class Md
+   * Tokenizer tokenizer (Сущность, позволяющая переводить строку в набор токенов по определенным правилам)
+   * HtmlBuilder htmlBuilder (Сущность, которая принимает корректный набор токенов и преобразует его в html-код)
+   + RenderToHtml (string -> string) (Принимает строку в md, возвращает строку в html
+   
+2. class Tokenizer
+   + Tokenize (string -> List<Token>) (Принимает строку в md, возвращает набор токенов)
+   + RemoveBadTokens (List<Token> -> List<Token>) (Неподходящие по спецификации токены специальных
+   последовательностей этим методом преобразуются в текст или удаляются)
+   
+3. class HtmlBuilder
+   + TokensToHtml (List<Token> -> string) (принимает набор токенов и преобразует их в html-код)
+   
+4. class Token
+   * string Value (текстовое значение токена)
+   * TokenType Type (Тип токена - пробел, символ, тег)
+   
+5. enum TokenType
