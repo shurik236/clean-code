@@ -39,19 +39,17 @@
 		// check — это шах
 		private static bool IsCheckForWhite()
 		{
-			var isCheck = false;
-			foreach (var loc in board.GetPieces(PieceColor.Black))
+			foreach (var location in board.GetPieces(PieceColor.Black))
 			{
-				var piece = board.GetPiece(loc);
-				var moves = piece.GetMoves(loc, board);
+				var piece = board.GetPiece(location);
+				var moves = piece.GetMoves(location, board);
 				foreach (var destination in moves)
 				{
 					if (board.GetPiece(destination).Is(PieceColor.White, PieceType.King))
-						isCheck = true;
+						return true;
 				}
 			}
-			if (isCheck) return true;
-			return false;
+		    return false;
 		}
 	}
 }
