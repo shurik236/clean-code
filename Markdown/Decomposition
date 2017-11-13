@@ -12,7 +12,7 @@
    
 3. class SyntaxProcessor
    + FixSyntaxErrors (List<Token> -> List<Token>) 
-   (Последовательно выполняет UnescapeSpecialSymbols -> FixInlineOrInspaceUnderscore -> ResolveNonMatchingTags)
+   (Последовательно выполняет FixInlineOrInspaceUnderscore -> ResolveNonMatchingTags -> UnescapeSpecialSymbols)
    + (private) ResolveNonMatchingTags 
    (Обащает в текст непарные теги, находит теги которые можно поправить чтобы они стали парными, затем выполняет FixInvalidTags)
    + (private) FixInvalidTags (Преобразует виды тегов, образуя пары. Добавляет появившиеся символы подчеркивания.)
