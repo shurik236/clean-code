@@ -41,3 +41,5 @@ __непарные _символы не считаются выделением.
 \_bold__italic\_ -> _bold__italic_
 
 \_\_\_italic_bold -> ___italic_bold
+
+\_\_\_kek\_\_ kek\_ -> ___kek__ kek_
