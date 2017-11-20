@@ -11,7 +11,10 @@ namespace Markdown
         [SetUp]
         public void SetUp()
         {
-            _tokenizer = new Tokenizer();
+            _tokenizer = new Tokenizer(new List<IParser>
+            {
+                new WhitespaceParser(), new EscapedSymbolParser(), new UnderlineParser()
+            });
         }
         [Test]
         public void ReturnEmptyList_WhenGivenEmptyString()
@@ -52,11 +55,11 @@ namespace Markdown
         {
             var expectedList = new List<Token>
             {
-                new Token("_", TokenType.Emphasis),
+                new Token("_", TokenType.Underline),
                 new Token("a", TokenType.Text),
                 new Token("b", TokenType.Text),
                 new Token("c", TokenType.Text),
-                new Token("_", TokenType.Emphasis)
+                new Token("_", TokenType.Underline)
             };
             _tokenizer.Tokenize("_abc_").ShouldBeEquivalentTo(expectedList);
         }
@@ -66,11 +69,11 @@ namespace Markdown
         {
             var expectedList = new List<Token>
             {
-                new Token("__", TokenType.Strong),
+                new Token("__", TokenType.Underline),
                 new Token("a", TokenType.Text),
                 new Token("b", TokenType.Text),
                 new Token("c", TokenType.Text),
-                new Token("__", TokenType.Strong)
+                new Token("__", TokenType.Underline)
             };
             _tokenizer.Tokenize("__abc__").ShouldBeEquivalentTo(expectedList);
         }

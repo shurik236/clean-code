@@ -1,14 +1,18 @@
-﻿namespace Markdown
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace Markdown
 {
-    internal enum TokenType
+    public enum TokenType
     {
         Text,
         Whitespace,
-        Emphasis,
-        Strong,
-        EscapedText
+        Underline,
+        EscapedText,
+        Opening,
+        Closing
     }
-    internal class Token
+    public class Token
     {
         public string Value { get; set; }
         public TokenType Type { get; set; }
@@ -19,9 +23,10 @@
             Type = type;
         }
 
-        public bool IsTag()
+        public void Clear()
         {
-            return Type == TokenType.Emphasis || Type == TokenType.Strong;
+            Type = TokenType.Text;
+            Value = "";
         }
     }
 }

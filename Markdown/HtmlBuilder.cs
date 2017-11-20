@@ -7,39 +7,12 @@ namespace Markdown
 {
     internal class HtmlBuilder
     {
-        private readonly Dictionary<TokenType, string> tagNames;
-
-        public HtmlBuilder()
+        public string HtmlFromTags(List<Tag> tags)
         {
-            tagNames = new Dictionary<TokenType, string>
-            {
-                {TokenType.Emphasis, "em"},
-                {TokenType.Strong, "strong" }
-            };
-        }
-
-        public string HtmlFromTokens(List<Token> tokens)
-        {
-            var tagStack = new Stack<Token>();
             var strBuilder = new StringBuilder();
-            foreach (var token in tokens)
+            foreach (var token in tags)
             {
-                if (!token.IsTag())
-                {
-                    strBuilder.Append(WebUtility.HtmlEncode(token.Value));
-                    continue;
-                }
-
-                if (!tagStack.Any() || tagStack.Peek().Type != token.Type)
-                {
-                    tagStack.Push(token);
-                    strBuilder.Append($"<{tagNames[token.Type]}>");
-                }
-                else
-                {
-                    tagStack.Pop();
-                    strBuilder.Append($"</{tagNames[token.Type]}>");
-                }    
+                strBuilder.Append(token.StringValue());
             }
 
             return strBuilder.ToString();

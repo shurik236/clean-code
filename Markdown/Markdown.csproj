@@ -63,6 +63,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="SyntaxProcessor.cs" />
     <Compile Include="SyntaxProcessorShould.cs" />
+    <Compile Include="Tag.cs" />
+    <Compile Include="TagConverter.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenizerTest.cs" />

@@ -29,7 +29,7 @@ namespace Markdown
             var tokens = new List<Token>
             {
                 new Token("a", TokenType.Text),
-                new Token("_", TokenType.Emphasis),
+                new Token("_", TokenType.Underline),
                 new Token("a", TokenType.Text)
             };
             var expected = new List<Token>
@@ -47,15 +47,16 @@ namespace Markdown
             var tokens = new List<Token>
             {
                 new Token(" ", TokenType.Whitespace),
-                new Token("_", TokenType.Emphasis),
+                new Token("_", TokenType.Underline),
                 new Token(" ", TokenType.Whitespace)
             };
             var expected = new List<Token>
             {
-                new Token("a", TokenType.Whitespace),
+                new Token(" ", TokenType.Whitespace),
                 new Token("_", TokenType.Text),
-                new Token("a", TokenType.Whitespace)
+                new Token(" ", TokenType.Whitespace)
             };
+            expected.ShouldBeEquivalentTo(new SyntaxProcessor().FixSyntaxErrors(tokens));
         }
     }
 }

@@ -1,17 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Markdown
 {
     internal class Tokenizer
     {
-        private readonly Dictionary<string, TokenType> specialSequencesTypes = new Dictionary<string, TokenType>
+        private readonly List<IParser> parsers;
+        public Tokenizer(List<IParser> parsers)
         {
-            {"_", TokenType.Emphasis },
-            {"__", TokenType.Strong },
-            {"\\_", TokenType.EscapedText },
-            {" ", TokenType.Whitespace }
-        };
+            this.parsers = parsers;
+        }
 
         public List<Token> Tokenize(string markdownString)
         {
@@ -29,20 +28,50 @@ namespace Markdown
 
         private Token ReadNextToken(string input)
         {
-            var prefix = ""+input[0];
-            while (prefix.Length < input.Length && IsPossiblySpecialSequence(prefix + input[prefix.Length]))
+            foreach (var parser in parsers)
             {
-                prefix += input[prefix.Length];
+                var nextToken = parser.GetNextToken(input);
+                if (nextToken != null)
+                    return nextToken;
             }
-
-            return !specialSequencesTypes.ContainsKey(prefix) ?
-                new Token(prefix, TokenType.Text) :
-                new Token(prefix, specialSequencesTypes[prefix]);
+            return new Token(input.Substring(0, 1), TokenType.Text);
         }
+    }
 
-        private bool IsPossiblySpecialSequence(string str)
+    public interface IParser
+    {
+        Token GetNextToken(string str);
+    }
+
+    public class UnderlineParser : IParser
+    {
+        public Token GetNextToken(string str)
         {
-            return specialSequencesTypes.Keys.Any(x => x.StartsWith(str));
+            var underlineSubstr = string.Concat(str.TakeWhile(x => x == '_'));
+            return underlineSubstr == "" ? null : new Token(underlineSubstr, TokenType.Underline);
+        }
+    }
+
+    public class EscapedSymbolParser : IParser
+    {
+        public Token GetNextToken(string str)
+        {
+            var escapedSequences = new HashSet<string> { "\\_" };
+            foreach (var sequence in escapedSequences)
+            {
+                if (!str.StartsWith(sequence)) continue;
+                return new Token(sequence, TokenType.EscapedText);
+            }
+            return null;
+        }
+    }
+
+    public class WhitespaceParser : IParser
+    {
+        public Token GetNextToken(string str)
+        {
+            var spaces = string.Concat(str.TakeWhile(x => x == ' '));
+            return spaces == "" ? null : new Token(spaces, TokenType.Whitespace);
         }
     }
 }
