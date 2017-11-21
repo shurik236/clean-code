@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Web;
 
 namespace Markdown
 {
@@ -6,8 +7,8 @@ namespace Markdown
     {
         Unresolved,
         Text,
-        Emphasis,
-        Strong
+        Italic,
+        Bold
     }
 
     public enum TagState{
@@ -16,13 +17,13 @@ namespace Markdown
         Closing
     }
 
-    class Tag
+    class Tag : IHtmlConvertible
     {
         private static Dictionary<TagType, string> TagNames = new Dictionary<TagType, string>
         {
             {TagType.Unresolved, "" },
-            {TagType.Emphasis, "em"},
-            {TagType.Strong, "strong"}
+            {TagType.Italic, "em"},
+            {TagType.Bold, "strong"}
         };
 
         public TagType Type { get; set; }
@@ -50,13 +51,13 @@ namespace Markdown
             Value = "";
         }
 
-        public string StringValue()
+        public string GetHtmlString()
         {
             if (Type == TagType.Text)
-                return Value;
+                return HttpUtility.HtmlEncode(Value);
             var closedTagMark = State == TagState.Closing ? "/" : "";
 
-            return "<" + closedTagMark + TagNames[Type] + ">";
+            return $"<{closedTagMark}{TagNames[Type]}>";
 
         }
 

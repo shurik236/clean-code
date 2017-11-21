@@ -36,37 +36,23 @@ namespace Markdown
             }
 
             while (openTagsStack.Any())
-            {
                 tokens[openTagsStack.Pop()].Type = TokenType.Text;
-            }
 
             return tokens;
         }
         
-        private List<Token> UnpackOpeningSequence(Token openingSequence, int tagCapacity)
+        private IEnumerable<Token> UnpackOpeningSequence(Token openingSequence, int tagCapacity)
         {
-            var result = new List<Token>();
             for (var i = 0; i<openingSequence.Value.Length; i++)
-            {
-                if (i - tagCapacity < 0)
-                    result.Add(new Token("_", TokenType.Opening));
-                else
-                    result.Add(new Token("_", TokenType.Text));
-            }
-            return result;
+                yield return i - tagCapacity < 0 ? new Token("_", TokenType.Opening) : new Token("_", TokenType.Text);           
         }
 
-        private List<Token> UnpackClosingSequence(Token closingSequence, int tagCapacity)
+        private IEnumerable<Token> UnpackClosingSequence(Token closingSequence, int tagCapacity)
         {
-            var result = new List<Token>();
             for (var i = 0; i < closingSequence.Value.Length; i++)
-            {
-                if (i + tagCapacity - closingSequence.Value.Length < 0)
-                    result.Add(new Token("_", TokenType.Text));
-                else
-                    result.Add(new Token("_", TokenType.Closing));
-            }
-            return result;
+                yield return i + tagCapacity - closingSequence.Value.Length < 0
+                    ? new Token("_", TokenType.Text)
+                    : new Token("_", TokenType.Closing);
         }
 
         private List<Token> ResolveOpeningClosingSequences(List<Token> tokens)

@@ -11,10 +11,11 @@ namespace Markdown
         [SetUp]
         public void SetUp()
         {
-            _tokenizer = new Tokenizer(new List<IParser>
-            {
-                new WhitespaceParser(), new EscapedSymbolParser(), new UnderlineParser()
-            });
+            _tokenizer = new Tokenizer(
+                new WhitespaceParser(),
+                new EscapedSymbolsParser(@"\_"),
+                new UnderlineParser()
+                );
         }
         [Test]
         public void ReturnEmptyList_WhenGivenEmptyString()

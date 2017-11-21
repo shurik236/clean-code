@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -6,10 +6,11 @@ namespace Markdown
 {
 	public class Md
 	{
-        private readonly Tokenizer tokenizer = new Tokenizer(new List<IParser>
-        {
-            new WhitespaceParser(), new EscapedSymbolParser(), new UnderlineParser()
-        });
+        private readonly Tokenizer tokenizer = new Tokenizer(
+            new WhitespaceParser(),
+            new EscapedSymbolsParser(@"\_"),
+            new UnderlineParser()
+            );
 
         private readonly SyntaxProcessor syntaxProcessor = new SyntaxProcessor();
         private readonly HtmlBuilder htmlBuilder = new HtmlBuilder();
@@ -17,7 +18,7 @@ namespace Markdown
 		public string RenderToHtml(string markdown)
 		{
 		    var tokens = tokenizer.Tokenize(markdown);
-		    var fixedTokens = syntaxProcessor.FixSyntaxErrors(tokens);
+		    var fixedTokens = syntaxProcessor.FixSyntaxErrors(tokens.ToList());
 		    var tags = tagConverter.GenerateTags(fixedTokens);
 		    return htmlBuilder.HtmlFromTags(tags);
 		}

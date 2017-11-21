@@ -5,6 +5,7 @@ namespace Markdown
 {
     class TagConverter
     {
+        private const int TagLengthLimit = 2;
         public List<Tag> GenerateTags(List<Token> tokens)
         {
             var openTagsStack = new Stack<int>();
@@ -13,29 +14,27 @@ namespace Markdown
             {
                 if (tokens[i].Type == TokenType.Opening)
                 {
-                    var openings = AcquireOpeningSequence(i, tokens);
+                    var openings = AcquireOpeningSequence(i, tokens).ToArray();
+                    for (var j = 0; j < openings.Length; j++)
                     {
-                        for (var j = 0; j < openings.Count; j++)
-                        {
-                            openTagsStack.Push(i);
-                            tags.Add(new Tag(TagType.Unresolved, TagState.Opening, ""));
-                            i++;
-                        }
-                        i--;
-                        continue;
+                        openTagsStack.Push(i);
+                        tags.Add(new Tag(TagType.Unresolved, TagState.Opening, ""));
+                        i++;
                     }
+                    i--;
+                    continue;
                 }
 
-                var closings = AcquireClosingSequence(i, tokens);
+                var closings = AcquireClosingSequence(i, tokens).ToArray();
                 if (!closings.Any()) tags.Add(new Tag(TagType.Text, TagState.Irrelevant, tokens[i].Value));
 
-                if (closings.Count == 1)
+                if (closings.Length == 1)
                 {
                     var openingTagPosition = openTagsStack.Pop();
-                    tags[openingTagPosition].Type = TagType.Emphasis;
-                    tags.Add(new Tag(TagType.Emphasis, TagState.Closing, tokens[i].Value));
+                    tags[openingTagPosition].Type = TagType.Italic;
+                    tags.Add(new Tag(TagType.Italic, TagState.Closing, tokens[i].Value));
                 }
-                else if (closings.Count == 2)
+                else if (closings.Length == 2)
                 {
                     var openingTagPosition = openTagsStack.Pop();
                     var prevOpeningTagPosition = openTagsStack.Peek();
@@ -43,45 +42,42 @@ namespace Markdown
                     {
                         openTagsStack.Pop();
                         tags[openingTagPosition].Clear();
-                        tags[prevOpeningTagPosition].Type = TagType.Strong;
+                        tags[prevOpeningTagPosition].Type = TagType.Bold;
                         tags.Add(new Tag(TagType.Text, TagState.Irrelevant, ""));
-                        tags.Add(new Tag(TagType.Strong, TagState.Closing, ""));
+                        tags.Add(new Tag(TagType.Bold, TagState.Closing, ""));
                         i++;
                     }
                     else
                     {
-                        tags[openingTagPosition].Type = TagType.Emphasis;
-                        tags.Add(new Tag(TagType.Emphasis, TagState.Closing, ""));
+                        tags[openingTagPosition].Type = TagType.Italic;
+                        tags.Add(new Tag(TagType.Italic, TagState.Closing, ""));
                     }
                 }
             }
             return tags;
         }
 
-        private List<Token> AcquireOpeningSequence(int start, List<Token> tokens)
+        private IEnumerable<Token> AcquireOpeningSequence(int start, List<Token> tokens)
         {
-            var result = new List<Token>();
             for (var i = start; i < tokens.Count; i++)
             {
                 if (tokens[i].Type != TokenType.Opening)
                     break;
-                result.Add(tokens[i]);
+                yield return tokens[i];
             }
 
-            return result;
         }
 
-        private List<Token> AcquireClosingSequence(int start, List<Token> tokens)
+        private IEnumerable<Token> AcquireClosingSequence(int start, List<Token> tokens)
         {
-            var result = new List<Token>();
+            var sequenceLength = 0;
             for (var i = start; i < tokens.Count; i++)
             {
-                if (tokens[i].Type != TokenType.Closing || result.Count == 2)
+                if (tokens[i].Type != TokenType.Closing || sequenceLength == TagLengthLimit)
                     break;
-                result.Add(tokens[i]);
+                yield return tokens[i];
+                sequenceLength++;
             }
-
-            return result;
         }
     }
 }

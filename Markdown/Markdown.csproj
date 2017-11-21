@@ -50,6 +50,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,7 +59,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EscapedSymbolsParser.cs" />
     <Compile Include="HtmlBuilder.cs" />
+    <Compile Include="IHtmlConvertible.cs" />
+    <Compile Include="IParser.cs" />
     <Compile Include="Md.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="SyntaxProcessor.cs" />
@@ -68,6 +72,8 @@
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="TokenizerTest.cs" />
+    <Compile Include="UnderlineParser.cs" />
+    <Compile Include="WhitespaceParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
