@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Markdown
 {
@@ -13,12 +14,10 @@ namespace Markdown
 
         public Token GetNextToken(string str)
         {
-            foreach (var sequence in escapedSequences)
-            {
-                if (!str.StartsWith(sequence)) continue;
-                return new Token(sequence, TokenType.EscapedText);
-            }
-            return null;
+            return 
+                (from sequence in escapedSequences
+                 where str.StartsWith(sequence)
+                 select new Token(sequence, TokenType.EscapedText)).FirstOrDefault();
         }
     }
 }
