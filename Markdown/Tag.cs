@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using System.Web;
 
 namespace Markdown
@@ -8,19 +9,16 @@ namespace Markdown
         Unresolved,
         Text,
         Italic,
-        Bold
-    }
-
-    public enum TagState{
-        Irrelevant,
-        Opening,
-        Closing
+        Bold,
+        Paragraph,
+        TextContainer
     }
 
     class Tag : IHtmlConvertible
     {
         private static Dictionary<TagType, string> TagNames = new Dictionary<TagType, string>
         {
+            {TagType.Paragraph, "p" },
             {TagType.Unresolved, "" },
             {TagType.Italic, "em"},
             {TagType.Bold, "strong"}
@@ -28,38 +26,38 @@ namespace Markdown
 
         public TagType Type { get; set; }
         public string Value { get; set; }
-        public TagState State { get; set; }
-
+        public Tag Parent { get; private set; }
+        public List<Tag> Children { get; }
 
         public Tag(TagType type)
         {
             Type = type;
             Value = "";
+            Children = new List<Tag>();
         }
 
-        public Tag(TagType type, TagState state, string str)
+        public Tag(TagType type, string str)
         {
             Type = type;
-            State = state;
             Value = str;
+            Children = new List<Tag>();
         }
 
-        public void Clear()
+        public void AddChild(Tag child)
         {
-            State = TagState.Irrelevant;
-            Type = TagType.Text;
-            Value = "";
+            child.Parent = this;
+            Children.Add(child);
         }
 
         public string GetHtmlString()
         {
             if (Type == TagType.Text)
                 return HttpUtility.HtmlEncode(Value);
-            var closedTagMark = State == TagState.Closing ? "/" : "";
 
-            return $"<{closedTagMark}{TagNames[Type]}>";
+            StringBuilder sb = new StringBuilder();
+            Children.ForEach(x => sb.Append(x.GetHtmlString()));
 
+            return Type == TagType.TextContainer ? sb.ToString() : $"<{TagNames[Type]}>{sb}</{TagNames[Type]}>";
         }
-
     }
 }
